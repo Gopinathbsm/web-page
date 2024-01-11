@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Data</title>
+</head>
+<body>
+    <h1>View Data</h1>
+    
+    <!-- Display Data -->
+    <div id="dataContainer"></div>
+
+    <!-- Edit Form -->
+    <form id="editForm">
+        <label for="editTitle">Title:</label>
+        <input type="text" id="editTitle" name="editTitle" required>
+        <br>
+        <label for="editDescription">Description:</label>
+        <textarea id="editDescription" name="editDescription" required></textarea>
+        <br>
+        <button type="button" onclick="saveEditedData()">Save</button>
+    </form>
+
+    <script>
+        // Fetch and display data
+        fetch('/getData', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const dataContainer = document.getElementById('dataContainer');
+            dataContainer.innerHTML = `
+                <p><strong>Title:</strong> ${data.title}</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                <p><strong>Created by:</strong> User ${data.userId}</p>
+                <button type="button" onclick="editData()">Edit</button>
+            `;
+            
+            // Pre-fill edit form fields
+            document.getElementById('editTitle').value = data.title;
+            document.getElementById('editDescription').value = data.description;
+        })
+        .catch(error => console.error('Error:', error));
+
+        // Function to switch to edit mode
+        function editData() {
+            document.getElementById('dataContainer').style.display = 'none';
+            document.getElementById('editForm').style.display = 'block';
+        }
+
+        // Function to save edited data
+        function saveEditedData() {
+            const editedTitle = document.getElementById('editTitle').value;
+            const editedDescription = document.getElementById('editDescription').value;
+
+            fetch('/updateData', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: editedTitle, description: editedDescription }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Data updated successfully');
+                    window.location.reload(); // Reload the page to display the updated data
+                } else {
+                    alert('Error updating data');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

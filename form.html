@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+</head>
+<body>
+    <h1>Form</h1>
+    <form id="formDataForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <br>
+        <button type="button" onclick="saveFormData()">Save</button>
+    </form>
+
+    <script>
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) {
+            alert('Unauthorized access. Please log in.');
+            window.location.href = '/'; // Redirect to the login page
+        }
+
+        function saveFormData() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            fetch('/formData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, description, userId }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Form data saved successfully');
+                } else {
+                    alert('Error saving form data');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
